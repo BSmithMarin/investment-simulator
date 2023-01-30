@@ -19,6 +19,6 @@ public class StockApiApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        fillData.fillInitialData();
+//        fillData.fillInitialData();
     }
 }
