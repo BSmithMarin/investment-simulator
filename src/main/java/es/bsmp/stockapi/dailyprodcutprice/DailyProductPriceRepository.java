@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DailyProductPriceRepository extends JpaRepository<DailyProductPrice,Integer> {
 
-    List<DailyProductPrice> findByFinancialProductOOrderByDay(FinancialProduct financialProduct);
+    List<DailyProductPrice> findByFinancialProductOrderByDay(FinancialProduct financialProduct);
 
     @Query("select d from DailyProductPrice d where d.financialProduct = ?1 order by d.day desc limit 1")
     DailyProductPrice findLastDailyProductPriceByFinancialProduct(FinancialProduct financialProduct);
