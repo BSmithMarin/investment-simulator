@@ -38,7 +38,7 @@ public class DailyProductPriceController {
                     ));
         }
 
-        List<DailyProductPrice> dailyProductPriceList = dailyProductPriceRepository.findByFinancialProduct(financialProduct);
+        List<DailyProductPrice> dailyProductPriceList = dailyProductPriceRepository.findByFinancialProductOOrderByDay(financialProduct);
 
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("records", dailyProductPriceList.size());
