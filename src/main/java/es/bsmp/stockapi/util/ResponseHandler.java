@@ -1,4 +1,4 @@
-package es.bsmp.stockapi.dailyprodcutprice;
+package es.bsmp.stockapi.util;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
