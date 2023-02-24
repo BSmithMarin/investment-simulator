@@ -8,13 +8,13 @@
     <artifactId>stock-api</artifactId>
     <version>1.0</version>
     <name>stock-api</name>
-    <description>RESTful API for daily stock info</description>
+    <description>RESTFul API for daily stock info</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.0.3</version>
+        <relativePath/>
     </parent>
 
     <properties>
@@ -25,6 +25,8 @@
     </properties>
 
     <dependencies>
+
+        <!--        springboot dependencies-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -33,23 +35,43 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
-
+        <!--        mariadb client-->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <scope>runtime</scope>
         </dependency>
 
+<!--        Lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+<!--        FLYWAY-->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.15.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>9.15.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
+
         <plugins>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -62,7 +84,9 @@
                     </excludes>
                 </configuration>
             </plugin>
+
         </plugins>
+
     </build>
 
 </project>

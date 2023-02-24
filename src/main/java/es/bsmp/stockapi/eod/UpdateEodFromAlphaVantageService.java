@@ -1,12 +1,11 @@
-package es.bsmp.stockapi.dailyprodcutprice;
+package es.bsmp.stockapi.eod;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.bsmp.stockapi.FinancialProduct.FinancialProduct;
 import es.bsmp.stockapi.FinancialProduct.FinancialProductRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -20,30 +19,25 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class UpdateDailyProductPriceAlphaVantageService {
+@Log4j2
+public class UpdateEodFromAlphaVantageService {
 
     Environment environment;
-    DailyProductPriceRepository dailyProductPriceRepository;
+    EodRepository eodRepository;
     FinancialProductRepository financialProductRepository;
-    private static final Logger logger = LogManager.getLogger(UpdateDailyProductPriceAlphaVantageService.class);
     private final Queue<FinancialProduct> queue;
     ScheduledExecutorService executorService;
 
     @Autowired
-    public UpdateDailyProductPriceAlphaVantageService(Environment environment, DailyProductPriceRepository dailyProductPriceRepository,
-                                                      FinancialProductRepository financialProductRepository, ScheduledExecutorService executorService) {
+    public UpdateEodFromAlphaVantageService(Environment environment, EodRepository eodRepository,
+                                            FinancialProductRepository financialProductRepository, ScheduledExecutorService executorService) {
         this.environment = environment;
-        this.dailyProductPriceRepository = dailyProductPriceRepository;
+        this.eodRepository = eodRepository;
         this.financialProductRepository = financialProductRepository;
         this.queue = new ArrayDeque<>();
         this.executorService = executorService;
@@ -55,7 +49,7 @@ public class UpdateDailyProductPriceAlphaVantageService {
         try{
             queue.addAll(financialProductRepository.findAll());
         }catch (Exception e){
-            logger.error("Error adding all financial products to the queue");
+            log.error("Error adding all financial products to the queue");
         }
 
     }
@@ -69,25 +63,25 @@ public class UpdateDailyProductPriceAlphaVantageService {
         if (financialProduct == null)
             return;
 
-        DailyProductPrice lastRecord= dailyProductPriceRepository
+        Eod lastRecord= eodRepository
                 .findLastDailyProductPriceByFinancialProduct(financialProduct);
 
         boolean fullOutputSize = lastRecord == null;
 
         try {
             String response = getDataFromAlphaVantage(financialProduct,fullOutputSize);
-            List<DailyProductPrice> dailyProductPriceList = mapAlphaVantageResponseToDailyProductPrice(response,financialProduct);
+            List<Eod> eodList = mapAlphaVantageResponseToDailyProductPrice(response,financialProduct);
 
             if (!fullOutputSize){
-                dailyProductPriceList = dailyProductPriceList.stream()
+                eodList = eodList.stream()
                                 .filter((d)-> (d.getDay().isAfter(lastRecord.getDay())))
                                 .toList();
             }
-            dailyProductPriceRepository.saveAll(dailyProductPriceList);
-            dailyProductPriceRepository.flush();
+            eodRepository.saveAll(eodList);
+            eodRepository.flush();
 
         }catch (Exception e){
-            logger.error("error retrieving data for "+financialProduct.getSymbol());
+            log.error("error retrieving data for "+financialProduct.getSymbol());
         }
 
     }
@@ -127,26 +121,26 @@ public class UpdateDailyProductPriceAlphaVantageService {
         try {
             response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString()).body();
         } catch (IOException | InterruptedException e) {
-            logger.error("Error recuperando los datos desde AlphaVantage.co");
+            log.error("Error recuperando los datos desde AlphaVantage.co");
             throw new RuntimeException(e);
         }
 
         return response;
     }
 
-    List<DailyProductPrice> mapAlphaVantageResponseToDailyProductPrice(String json,FinancialProduct financialProduct) {
+    List<Eod> mapAlphaVantageResponseToDailyProductPrice(String json, FinancialProduct financialProduct) {
 
-        List<DailyProductPrice> dailyProductPriceList;
+        List<Eod> eodList;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(json);
             Iterator<Map.Entry<String, JsonNode>> iterator = rootNode.get("Time Series (Daily)").fields();
 
-            dailyProductPriceList = new ArrayList<>(1000);
+            eodList = new ArrayList<>(1000);
             while (iterator.hasNext()) {
                 Map.Entry<String, JsonNode> element = iterator.next();
 
-                dailyProductPriceList.add(new DailyProductPrice(
+                eodList.add(new Eod(
                         LocalDate.parse(element.getKey(), DateTimeFormatter.ISO_LOCAL_DATE),
                         element.getValue().get("1. open").asDouble(),
                         element.getValue().get("2. high").asDouble(),
@@ -162,6 +156,6 @@ public class UpdateDailyProductPriceAlphaVantageService {
             System.err.println("Error parsing the json content");
             throw new RuntimeException(e);
         }
-        return  dailyProductPriceList;
+        return eodList;
     }
 }

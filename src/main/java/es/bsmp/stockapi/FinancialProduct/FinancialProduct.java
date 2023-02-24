@@ -22,6 +22,11 @@ public class FinancialProduct {
     private String symbol;
     @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "data_source", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private DataSource dataSource;
+    @Column(name = "data_source_symbol",nullable = false)
+    private String dataSourceSymbol;
 
     public FinancialProduct(String isin, String symbol, String name) {
         this.isin = isin;

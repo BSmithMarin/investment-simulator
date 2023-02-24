@@ -1,4 +1,4 @@
-package es.bsmp.stockapi.dailyprodcutprice;
+package es.bsmp.stockapi.eod;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "daily_product_price")
+@Table(name = "eod")
 @Data
 @NoArgsConstructor
-public class DailyProductPrice {
+public class Eod {
 
     @Id
-    @SequenceGenerator(sequenceName = "daily_product_price_seq",name = "daily_product_price",allocationSize = 53)
+    @SequenceGenerator(sequenceName = "eod_seq",name = "daily_product_price")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_product_price" )
     @JsonIgnore
     private Long id;
@@ -41,7 +41,7 @@ public class DailyProductPrice {
     private FinancialProduct financialProduct;
 
 
-    public DailyProductPrice(LocalDate day, double openPrice, double highPrice, double lowPrice, double closePrice, double dividendPerShare, int volume, FinancialProduct financialProductId) {
+    public Eod(LocalDate day, double openPrice, double highPrice, double lowPrice, double closePrice, double dividendPerShare, int volume, FinancialProduct financialProductId) {
         this.day = day;
         this.openPrice = openPrice;
         this.highPrice = highPrice;
