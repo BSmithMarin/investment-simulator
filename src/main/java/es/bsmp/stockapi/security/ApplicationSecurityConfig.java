@@ -1,5 +1,8 @@
 package es.bsmp.stockapi.security;
 
+import es.bsmp.stockapi.security.apikeyauthentication.ApiKeyAuthenticationConfigurer;
+import es.bsmp.stockapi.security.apikeyauthentication.ApiKeyAuthenticationProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -16,25 +19,37 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 class ApplicationSecurityConfig {
 
     @Bean
     @Order(1)
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain apiFilterChain(HttpSecurity http, ApiKeyAuthenticationConfigurer configurer) throws Exception {
 
         http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/singup")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .apply(new ApiKeyAuthenticationConfigurer())
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .cors(withDefaults());
+                .securityMatcher("/api/**")
+                .authorizeHttpRequests(authorize -> {
+                    authorize.anyRequest().authenticated();
+                })
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                ).apply(configurer);
+
+        return http.build();
+    }
+
+    @Bean
+    SecurityFilterChain appFilterChain(HttpSecurity http) throws Exception {
+
+        http.csrf().disable()
+                .cors(withDefaults())
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/singup", "/login").permitAll();
+                    auth.anyRequest().authenticated();
+                })
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
 
         return http.build();
     }
@@ -57,5 +72,9 @@ class ApplicationSecurityConfig {
         return configuration;
     }
 
+    @Bean
+    ApiKeyAuthenticationConfigurer apiKeyAuthenticationConfigurer(ApiKeyAuthenticationProvider authenticationProvider) {
+        return new ApiKeyAuthenticationConfigurer(authenticationProvider);
+    }
 
 }

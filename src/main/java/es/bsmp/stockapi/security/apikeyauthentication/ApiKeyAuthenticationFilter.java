@@ -1,4 +1,4 @@
-package es.bsmp.stockapi.security;
+package es.bsmp.stockapi.security.apikeyauthentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,8 +29,7 @@ class ApiKeyAuthenticationFilter extends AuthenticationFilter {
         String apiKey = request.getParameter("apikey");
 
         if (apiKey == null) {
-            return null;
-//            throw new BadCredentialsException("you must provide an API KEY format apikey=YOUR_API_KEY");
+            throw new BadCredentialsException("you must provide an API KEY format apikey=YOUR_API_KEY");
         }
 
         return ApiKeyAuthentication.authenticationRequest(apiKey);

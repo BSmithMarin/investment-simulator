@@ -1,6 +1,8 @@
 package es.bsmp.stockapi.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -26,7 +28,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public Optional<User> getUserByUuid(UUID uuid) {
+    public Optional<User> getUserByApiKey(UUID uuid) {
         return userRepository.findByApiKey(uuid);
     }
 
@@ -34,5 +36,13 @@ public class UserServiceImp implements UserService {
     public Optional<User> getUserByEmail(String email) {
 
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        return getUserByEmail(username).orElseThrow(
+                () -> new UsernameNotFoundException("user not found")
+        );
     }
 }

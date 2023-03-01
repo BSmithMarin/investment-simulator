@@ -1,4 +1,4 @@
-package es.bsmp.stockapi.security;
+package es.bsmp.stockapi.security.apikeyauthentication;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
