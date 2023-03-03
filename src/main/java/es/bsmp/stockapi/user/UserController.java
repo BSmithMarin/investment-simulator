@@ -55,4 +55,9 @@ public class UserController {
         return tokenService.generateToken(authentication);
     }
 
+    @PostMapping("/test")
+    public String test(){
+        return "athenticated";
+    }
+
 }

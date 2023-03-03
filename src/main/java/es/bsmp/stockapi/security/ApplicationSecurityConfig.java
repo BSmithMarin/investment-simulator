@@ -108,8 +108,8 @@ class ApplicationSecurityConfig {
     @Bean
     JwtDecoder jwtDecoder(){
         return NimbusJwtDecoder
-                .withSecretKey(new SecretKeySpec(JWT_KEY.getBytes(),""))
-                .macAlgorithm(MacAlgorithm.HS384)
+                .withSecretKey(new SecretKeySpec(JWT_KEY.getBytes(),"RSA"))
+                .macAlgorithm(MacAlgorithm.HS512)
                 .build();
     }
 
