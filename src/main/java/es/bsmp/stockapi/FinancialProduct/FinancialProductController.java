@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "api/${api.version}")
+@RequestMapping(path = "${base.url}")
 public class FinancialProductController {
     @Autowired
     FinancialProductRepository financialProductRepository;

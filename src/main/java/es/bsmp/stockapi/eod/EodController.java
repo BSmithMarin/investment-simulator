@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "api/${api.version}/eod")
+@RequestMapping(path = "${base.url}/eod")
 @RequiredArgsConstructor
 public class EodController {
 

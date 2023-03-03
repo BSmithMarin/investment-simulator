@@ -19,6 +19,8 @@ public class ErrorController {
             RequestMethod.DELETE})
     public ResponseEntity<Object> error() {
 
-        return new ResponseEntity<>(Map.of("error", "Route not found"), HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of("error", "Route not found"));
     }
 }
